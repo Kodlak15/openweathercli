@@ -38,13 +38,54 @@ struct Weather {
     icon: Option<String>,
 }
 
-struct Main {}
+struct Main {
+    temp: Option<String>,
+    feels_like: Option<String>,
+    temp_min: Option<String>,
+    temp_max: Option<String>,
+    pressure: Option<String>,
+    humidity: Option<String>,
+    sea_level: Option<String>,
+    grnd_level: Option<String>,
+}
+
+struct Wind {
+    speed: Option<String>,
+    deg: Option<String>,
+    gust: Option<String>,
+}
+
+struct Rain {
+    _1h: Option<String>,
+}
+
+struct Clouds {
+    all: Option<String>,
+}
+
+struct Sys {
+    r#type: Option<String>,
+    id: Option<String>,
+    country: Option<String>,
+    sunrise: Option<String>,
+    sunset: Option<String>,
+}
 
 struct CurrentWeather {
     coord: Option<Coord>,
     weather: Option<Weather>,
     base: Option<String>,
     main: Option<Main>,
+    visibility: Option<String>,
+    wind: Option<Wind>,
+    rain: Option<Rain>,
+    clouds: Option<Clouds>,
+    dt: Option<String>,
+    sys: Option<Sys>,
+    timezone: Option<String>,
+    id: Option<String>,
+    name: Option<String>,
+    cod: Option<String>,
 }
 
 // this is only for current weather!
