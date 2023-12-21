@@ -215,8 +215,8 @@ impl CurrentWeather {
                         .expect("Could not unpack current temperature!");
 
                     let temp = match units {
-                        "C" => to_celsius(temp),
-                        "F" => to_fahrenheight(temp),
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
                         _ => temp,
                     };
 
@@ -231,15 +231,153 @@ impl CurrentWeather {
                         .expect("Could not unpack current temperature!");
 
                     let temp = match units {
-                        "C" => to_celsius(temp),
-                        "F" => to_fahrenheight(temp),
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
                         _ => temp,
                     };
 
                     println!("{:.2}{}", temp, units);
                 }
             },
-            _ => todo!(),
+            "feels_like" => match args.verbose {
+                true => {
+                    let feels_like = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .feels_like
+                        .expect("Could not unpack wind chill!");
+
+                    let feels_like = match units {
+                        "M" => to_celsius(feels_like),
+                        "I" => to_fahrenheight(feels_like),
+                        _ => feels_like,
+                    };
+
+                    println!("Wind Chill: {:.2}{}", feels_like, units);
+                }
+                false => {
+                    let feels_like = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .feels_like
+                        .expect("Could not unpack wind chill!");
+
+                    let feels_like = match units {
+                        "M" => to_celsius(feels_like),
+                        "I" => to_fahrenheight(feels_like),
+                        _ => feels_like,
+                    };
+
+                    println!("{:.2}{}", feels_like, units);
+                }
+            },
+            "temp_min" => match args.verbose {
+                true => {
+                    let temp = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp_min
+                        .expect("Could not unpack min temp!");
+
+                    let temp = match units {
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("Low Temperature: {:.2}{}", temp, units);
+                }
+                false => {
+                    let temp = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp_min
+                        .expect("Could not unpack min temp!");
+
+                    let temp = match units {
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("{:.2}{}", temp, units);
+                }
+            },
+            "temp_max" => match args.verbose {
+                true => {
+                    let temp = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp_max
+                        .expect("Could not unpack max temp!");
+
+                    let temp = match units {
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("High Temperature: {:.2}{}", temp, units);
+                }
+                false => {
+                    let temp = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp_max
+                        .expect("Could not unpack max temp!");
+
+                    let temp = match units {
+                        "M" => to_celsius(temp),
+                        "I" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("{:.2}{}", temp, units);
+                }
+            },
+            "pressure" => match args.verbose {
+                true => println!(
+                    "Pressure: {}hPa",
+                    self.clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .pressure
+                        .expect("Could not unpack pressure!")
+                ),
+                false => println!(
+                    "{}hPa",
+                    self.clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .pressure
+                        .expect("Could not unpack pressure!")
+                ),
+            },
+            "humidity" => match args.verbose {
+                true => println!(
+                    "Humidity: {}%",
+                    self.clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .humidity
+                        .expect("Could not unpack humidity!")
+                ),
+                false => println!(
+                    "{}%",
+                    self.clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .humidity
+                        .expect("Could not unpack humidity!")
+                ),
+            },
+            _ => println!("No data to print for option {}", opt),
         };
     }
 }
