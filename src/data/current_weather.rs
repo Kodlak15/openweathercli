@@ -161,7 +161,6 @@ impl CurrentWeather {
                         .expect("Could not unpack longitude!")
                 ),
             },
-            ////////// workspace
             "weather" => match args.verbose {
                 true => println!(
                     "Current weather: {}",
@@ -206,7 +205,6 @@ impl CurrentWeather {
                         .expect("Could not unpack weather description!")
                 ),
             },
-            ////////// end workspace
             "temp" => match args.verbose {
                 true => {
                     let temp = self
