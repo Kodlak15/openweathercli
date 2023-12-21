@@ -741,6 +741,24 @@ impl CurrentWeather {
                     println!("{:.2}{}", snow, units);
                 }
             },
+            "clouds" => match args.verbose {
+                true => println!(
+                    "Clouds: {}%",
+                    self.clone()
+                        .clouds
+                        .expect("Could not unpack clouds!")
+                        .all
+                        .expect("Could not unpack all clouds!")
+                ),
+                false => println!(
+                    "{}%",
+                    self.clone()
+                        .clouds
+                        .expect("Could not unpack clouds!")
+                        .all
+                        .expect("Could not unpack all clouds!")
+                ),
+            },
             _ => println!("No data to print for option {}", opt),
         };
     }
