@@ -1,5 +1,5 @@
 use crate::{
-    data::convert::{to_celsius, to_fahrenheight, to_mph},
+    data::convert::{to_celsius, to_fahrenheight, to_inches, to_mph},
     options::{args::Args, environment::Environment},
 };
 use serde::Deserialize;
@@ -464,7 +464,7 @@ impl CurrentWeather {
 
                     let units = match units {
                         "M" => "m/s",
-                        "I" => "miles/hr",
+                        "I" => "mph",
                         _ => "m/s",
                     };
 
@@ -486,7 +486,7 @@ impl CurrentWeather {
 
                     let units = match units {
                         "M" => "m/s",
-                        "I" => "miles/hr",
+                        "I" => "mph",
                         _ => "m/s",
                     };
 
@@ -511,7 +511,6 @@ impl CurrentWeather {
                         .expect("Could not unpack wind direction!")
                 ),
             },
-            // Start
             "wind_gust" => match args.verbose {
                 true => {
                     let speed = self
@@ -529,7 +528,7 @@ impl CurrentWeather {
 
                     let units = match units {
                         "M" => "m/s",
-                        "I" => "miles/hr",
+                        "I" => "mph",
                         _ => "m/s",
                     };
 
@@ -551,7 +550,54 @@ impl CurrentWeather {
 
                     let units = match units {
                         "M" => "m/s",
-                        "I" => "miles/hr",
+                        "I" => "mph",
+                        _ => "m/s",
+                    };
+
+                    println!("{:.2}{}", speed, units);
+                }
+            },
+            // Start
+            "rain_1h" => match args.verbose {
+                true => {
+                    let rain = self
+                        .clone()
+                        .rain
+                        .expect("Could not unpack rain!")
+                        ._1h
+                        .expect("Could not unpack 1 hour rainfall!");
+
+                    let rain = match units {
+                        "M" => rain,
+                        "I" => to_inches(rain),
+                        _ => rain,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("Rainfall 1hr: {:.2}{}", rain, units);
+                }
+                false => {
+                    let speed = self
+                        .clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .gust
+                        .expect("Could not unpack wind gust!");
+
+                    let speed = match units {
+                        "M" => speed,
+                        "I" => to_mph(speed),
+                        _ => speed,
+                    };
+
+                    let units = match units {
+                        "M" => "m/s",
+                        "I" => "mph",
                         _ => "m/s",
                     };
 
