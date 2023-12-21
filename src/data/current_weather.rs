@@ -114,7 +114,7 @@ impl CurrentWeather {
         Ok(data)
     }
 
-    pub fn print(&self, opt: &str, verbose: bool) {
+    pub fn print(&self, opt: &str, units: &str, verbose: bool) {
         match opt {
             "lat" => match verbose {
                 true => println!(
@@ -150,6 +150,26 @@ impl CurrentWeather {
                         .expect("Could not unpack coordinates!")
                         .lon
                         .expect("Could not unpack longitude!")
+                ),
+            },
+            "temp" => match verbose {
+                true => {
+                    let temp = self
+                        .clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp
+                        .expect("Could not unpack current temperature!");
+
+                    println!("Current Temperature: {}", temp);
+                }
+                false => println!(
+                    "{}",
+                    self.clone()
+                        .main
+                        .expect("Could not unpack main!")
+                        .temp
+                        .expect("Could not unpack current temperature!")
                 ),
             },
             _ => todo!(),

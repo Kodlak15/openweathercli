@@ -18,9 +18,13 @@ async fn main() -> Result<(), reqwest::Error> {
     }
     .await?;
 
-    if let Some(opts) = args.print {
+    if let Some(opts) = &args.print {
         opts.split(',').for_each(|opt| {
-            data.print(opt, args.verbose);
+            if let Some(units) = &args.units {
+                data.print(opt, units, args.verbose);
+            } else {
+                data.print(opt, "default", args.verbose);
+            }
         });
     }
 
