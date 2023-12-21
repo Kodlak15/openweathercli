@@ -1,9 +1,13 @@
 use clap::Parser;
-use openweathercli::{data::current_weather::CurrentWeather, options::args::Args};
+use openweathercli::{
+    data::current_weather::CurrentWeather,
+    options::{args::Args, environment::Environment},
+};
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
     let args = Args::parse();
+    let environment = Environment::load();
 
     let api = if let Some(api) = &args.api {
         api.to_owned()
@@ -12,19 +16,15 @@ async fn main() -> Result<(), reqwest::Error> {
     };
 
     let data = match api.as_str() {
-        "current" => CurrentWeather::get(&args),
+        "current" => CurrentWeather::get(&args, &environment),
         "forecast" => todo!(),
-        _ => CurrentWeather::get(&args),
+        _ => CurrentWeather::get(&args, &environment),
     }
     .await?;
 
     if let Some(opts) = &args.print {
         opts.split(',').for_each(|opt| {
-            if let Some(units) = &args.units {
-                data.print(opt, units, args.verbose);
-            } else {
-                data.print(opt, "default", args.verbose);
-            }
+            data.print(opt, &args, &environment);
         });
     }
 

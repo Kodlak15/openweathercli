@@ -3,6 +3,7 @@ use std::{collections::HashMap, env};
 
 pub struct Environment {
     pub key: String,
+    pub units: String,
 }
 
 impl Environment {
@@ -14,10 +15,15 @@ impl Environment {
         let key = if let Some(key) = environment.get("API_KEY") {
             key.to_string()
         } else {
-            // Not entirely sure that I want to panic here
-            panic!("Failed to load API key!");
+            "".to_string()
         };
 
-        Self { key }
+        let units = if let Some(units) = environment.get("UNITS") {
+            units.to_string()
+        } else {
+            "".to_string()
+        };
+
+        Self { key, units }
     }
 }

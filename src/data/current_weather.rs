@@ -1,4 +1,7 @@
-use crate::options::{args::Args, environment::Environment};
+use crate::{
+    data::convert::{to_celsius, to_fahrenheight},
+    options::{args::Args, environment::Environment},
+};
 use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
@@ -9,7 +12,7 @@ pub struct Coord {
 
 #[derive(Deserialize, Clone)]
 pub struct Weather {
-    pub weather: WeatherData,
+    pub weather: Option<WeatherData>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -77,9 +80,7 @@ pub struct CurrentWeather {
 }
 
 impl CurrentWeather {
-    pub async fn get(args: &Args) -> Result<Self, reqwest::Error> {
-        let environment = Environment::load();
-
+    pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
         let lat = match args.lat {
             Some(lat) => lat,
             None => 0,
@@ -114,9 +115,17 @@ impl CurrentWeather {
         Ok(data)
     }
 
-    pub fn print(&self, opt: &str, units: &str, verbose: bool) {
+    pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {
+        let units = match &args.units {
+            Some(units) => units,
+            None => &environment.units,
+        }
+        .to_uppercase();
+
+        let units = units.as_str();
+
         match opt {
-            "lat" => match verbose {
+            "lat" => match args.verbose {
                 true => println!(
                     "Latitude: {}",
                     self.clone()
@@ -134,7 +143,7 @@ impl CurrentWeather {
                         .expect("Could not unpack latitude!")
                 ),
             },
-            "lon" => match verbose {
+            "lon" => match args.verbose {
                 true => println!(
                     "Longitude: {}",
                     self.clone()
@@ -152,7 +161,53 @@ impl CurrentWeather {
                         .expect("Could not unpack longitude!")
                 ),
             },
-            "temp" => match verbose {
+            ////////// workspace
+            "weather" => match args.verbose {
+                true => println!(
+                    "Current weather: {}",
+                    self.clone()
+                        .weather
+                        .expect("Could not unpack weather!")
+                        .weather
+                        .expect("Could not unpack weather data!")
+                        .main
+                        .expect("Could not unpack main weather type!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone()
+                        .weather
+                        .expect("Could not unpack weather!")
+                        .weather
+                        .expect("Could not unpack weather data!")
+                        .main
+                        .expect("Could not unpack main weather type!")
+                ),
+            },
+            "description" => match args.verbose {
+                true => println!(
+                    "Weather description: {}",
+                    self.clone()
+                        .weather
+                        .expect("Could not unpack weather!")
+                        .weather
+                        .expect("Could not unpack weather data!")
+                        .description
+                        .expect("Could not unpack weather description!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone()
+                        .weather
+                        .expect("Could not unpack weather!")
+                        .weather
+                        .expect("Could not unpack weather data!")
+                        .description
+                        .expect("Could not unpack weather description!")
+                ),
+            },
+            ////////// end workspace
+            "temp" => match args.verbose {
                 true => {
                     let temp = self
                         .clone()
@@ -161,16 +216,30 @@ impl CurrentWeather {
                         .temp
                         .expect("Could not unpack current temperature!");
 
-                    println!("Current Temperature: {}", temp);
+                    let temp = match units {
+                        "C" => to_celsius(temp),
+                        "F" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("Current Temperature: {:.2}{}", temp, units);
                 }
-                false => println!(
-                    "{}",
-                    self.clone()
+                false => {
+                    let temp = self
+                        .clone()
                         .main
                         .expect("Could not unpack main!")
                         .temp
-                        .expect("Could not unpack current temperature!")
-                ),
+                        .expect("Could not unpack current temperature!");
+
+                    let temp = match units {
+                        "C" => to_celsius(temp),
+                        "F" => to_fahrenheight(temp),
+                        _ => temp,
+                    };
+
+                    println!("{:.2}{}", temp, units);
+                }
             },
             _ => todo!(),
         };
