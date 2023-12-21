@@ -77,7 +77,7 @@ pub struct CurrentWeather {
 }
 
 impl CurrentWeather {
-    pub async fn get(args: Args) -> Result<Self, reqwest::Error> {
+    pub async fn get(args: &Args) -> Result<Self, reqwest::Error> {
         let environment = Environment::load();
 
         let lat = match args.lat {
@@ -90,9 +90,9 @@ impl CurrentWeather {
             None => 0,
         };
 
-        let key = match args.key {
+        let key = match &args.key {
             Some(key) => key,
-            None => environment.key,
+            None => &environment.key,
         };
 
         let req_uri = format!(
@@ -111,52 +111,48 @@ impl CurrentWeather {
         let data: CurrentWeather =
             serde_json::from_str(&body).expect("Failed to deserialize response body!");
 
-        if let Some(opts) = args.print {
-            opts.split(',').for_each(|opt| match opt {
-                "lat" => match args.verbose {
-                    true => println!(
-                        "Latitude: {}",
-                        &data
-                            .clone()
-                            .coord
-                            .expect("Could not unpack coordinates!")
-                            .lat
-                            .expect("Could not unpack latitude!")
-                    ),
-                    false => println!(
-                        "{}",
-                        &data
-                            .clone()
-                            .coord
-                            .expect("Could not unpack coordinates!")
-                            .lat
-                            .expect("Could not unpack latitude!")
-                    ),
-                },
-                "lon" => match args.verbose {
-                    true => println!(
-                        "Longitude: {}",
-                        &data
-                            .clone()
-                            .coord
-                            .expect("Could not unpack coordinates!")
-                            .lon
-                            .expect("Could not unpack longitude!")
-                    ),
-                    false => println!(
-                        "{}",
-                        &data
-                            .clone()
-                            .coord
-                            .expect("Could not unpack coordinates!")
-                            .lon
-                            .expect("Could not unpack longitude!")
-                    ),
-                },
-                _ => todo!(),
-            });
-        }
-
         Ok(data)
+    }
+
+    pub fn print(&self, opt: &str, verbose: bool) {
+        match opt {
+            "lat" => match verbose {
+                true => println!(
+                    "Latitude: {}",
+                    self.clone()
+                        .coord
+                        .expect("Could not unpack coordinates!")
+                        .lat
+                        .expect("Could not unpack latitude!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone()
+                        .coord
+                        .expect("Could not unpack coordinates!")
+                        .lat
+                        .expect("Could not unpack latitude!")
+                ),
+            },
+            "lon" => match verbose {
+                true => println!(
+                    "Longitude: {}",
+                    self.clone()
+                        .coord
+                        .expect("Could not unpack coordinates!")
+                        .lon
+                        .expect("Could not unpack longitude!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone()
+                        .coord
+                        .expect("Could not unpack coordinates!")
+                        .lon
+                        .expect("Could not unpack longitude!")
+                ),
+            },
+            _ => todo!(),
+        };
     }
 }

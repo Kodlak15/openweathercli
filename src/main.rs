@@ -5,20 +5,24 @@ use openweathercli::{data::current_weather::CurrentWeather, options::args::Args}
 async fn main() -> Result<(), reqwest::Error> {
     let args = Args::parse();
 
-    // Get the api option (current/forecast)
     let api = if let Some(api) = &args.api {
         api.to_owned()
     } else {
         "current".to_string()
     };
 
-    // Pass to api handler
-    match api.as_str() {
-        "current" => CurrentWeather::get(args),
+    let data = match api.as_str() {
+        "current" => CurrentWeather::get(&args),
         "forecast" => todo!(),
-        _ => CurrentWeather::get(args),
+        _ => CurrentWeather::get(&args),
     }
     .await?;
+
+    if let Some(opts) = args.print {
+        opts.split(',').for_each(|opt| {
+            data.print(opt, args.verbose);
+        });
+    }
 
     Ok(())
 }

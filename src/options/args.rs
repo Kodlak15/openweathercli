@@ -13,7 +13,9 @@ pub struct Args {
     #[arg(short, long)]
     pub key: Option<String>,
     #[arg(short, long)]
-    pub print: Option<String>,
+    pub print: Option<String>, // Print user specified information
+    #[arg(short, long)]
+    pub summary: Option<String>, // Print general summary of data
     #[arg(short, long, action)]
     pub verbose: bool,
 }
