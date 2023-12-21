@@ -1,5 +1,5 @@
 use crate::{
-    data::convert::{to_celsius, to_fahrenheight},
+    data::convert::{to_celsius, to_fahrenheight, to_mph},
     options::{args::Args, environment::Environment},
 };
 use serde::Deserialize;
@@ -45,6 +45,13 @@ pub struct Wind {
 #[derive(Deserialize, Clone)]
 pub struct Rain {
     pub _1h: Option<f32>,
+    pub _3h: Option<f32>,
+}
+
+#[derive(Deserialize, Clone)]
+pub struct Snow {
+    pub _1h: Option<f32>,
+    pub _3h: Option<f32>,
 }
 
 #[derive(Deserialize, Clone)]
@@ -70,6 +77,7 @@ pub struct CurrentWeather {
     pub visibility: Option<i32>,
     pub wind: Option<Wind>,
     pub rain: Option<Rain>,
+    pub snow: Option<Snow>,
     pub clouds: Option<Clouds>,
     pub dt: Option<i32>,
     pub sys: Option<Sys>,
@@ -220,6 +228,12 @@ impl CurrentWeather {
                         _ => temp,
                     };
 
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
+                    };
+
                     println!("Current Temperature: {:.2}{}", temp, units);
                 }
                 false => {
@@ -234,6 +248,12 @@ impl CurrentWeather {
                         "M" => to_celsius(temp),
                         "I" => to_fahrenheight(temp),
                         _ => temp,
+                    };
+
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
                     };
 
                     println!("{:.2}{}", temp, units);
@@ -254,6 +274,12 @@ impl CurrentWeather {
                         _ => feels_like,
                     };
 
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
+                    };
+
                     println!("Wind Chill: {:.2}{}", feels_like, units);
                 }
                 false => {
@@ -268,6 +294,12 @@ impl CurrentWeather {
                         "M" => to_celsius(feels_like),
                         "I" => to_fahrenheight(feels_like),
                         _ => feels_like,
+                    };
+
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
                     };
 
                     println!("{:.2}{}", feels_like, units);
@@ -288,6 +320,12 @@ impl CurrentWeather {
                         _ => temp,
                     };
 
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
+                    };
+
                     println!("Low Temperature: {:.2}{}", temp, units);
                 }
                 false => {
@@ -302,6 +340,12 @@ impl CurrentWeather {
                         "M" => to_celsius(temp),
                         "I" => to_fahrenheight(temp),
                         _ => temp,
+                    };
+
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
                     };
 
                     println!("{:.2}{}", temp, units);
@@ -322,6 +366,12 @@ impl CurrentWeather {
                         _ => temp,
                     };
 
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
+                    };
+
                     println!("High Temperature: {:.2}{}", temp, units);
                 }
                 false => {
@@ -336,6 +386,12 @@ impl CurrentWeather {
                         "M" => to_celsius(temp),
                         "I" => to_fahrenheight(temp),
                         _ => temp,
+                    };
+
+                    let units = match units {
+                        "M" => "°C",
+                        "I" => "°F",
+                        _ => "°K",
                     };
 
                     println!("{:.2}{}", temp, units);
@@ -377,6 +433,132 @@ impl CurrentWeather {
                         .expect("Could not unpack humidity!")
                 ),
             },
+            "visibility" => match args.verbose {
+                true => println!(
+                    "Visibility: {}m",
+                    self.clone()
+                        .visibility
+                        .expect("Could not unpack visibility!")
+                ),
+                false => println!(
+                    "{}m",
+                    self.clone()
+                        .visibility
+                        .expect("Could not unpack visibility!")
+                ),
+            },
+            "wind_speed" => match args.verbose {
+                true => {
+                    let speed = self
+                        .clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .speed
+                        .expect("Could not unpack wind speed!");
+
+                    let speed = match units {
+                        "M" => speed,
+                        "I" => to_mph(speed),
+                        _ => speed,
+                    };
+
+                    let units = match units {
+                        "M" => "m/s",
+                        "I" => "miles/hr",
+                        _ => "m/s",
+                    };
+
+                    println!("Wind Speed: {:.2}{}", speed, units);
+                }
+                false => {
+                    let speed = self
+                        .clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .speed
+                        .expect("Could not unpack wind speed!");
+
+                    let speed = match units {
+                        "M" => speed,
+                        "I" => to_mph(speed),
+                        _ => speed,
+                    };
+
+                    let units = match units {
+                        "M" => "m/s",
+                        "I" => "miles/hr",
+                        _ => "m/s",
+                    };
+
+                    println!("{:.2}{}", speed, units);
+                }
+            },
+            "wind_dir" => match args.verbose {
+                true => println!(
+                    "Wind Direction: {}°",
+                    self.clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .deg
+                        .expect("Could not unpack wind direction!")
+                ),
+                false => println!(
+                    "{}°",
+                    self.clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .deg
+                        .expect("Could not unpack wind direction!")
+                ),
+            },
+            // Start
+            "wind_gust" => match args.verbose {
+                true => {
+                    let speed = self
+                        .clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .gust
+                        .expect("Could not unpack wind gust!");
+
+                    let speed = match units {
+                        "M" => speed,
+                        "I" => to_mph(speed),
+                        _ => speed,
+                    };
+
+                    let units = match units {
+                        "M" => "m/s",
+                        "I" => "miles/hr",
+                        _ => "m/s",
+                    };
+
+                    println!("Wind Gust: {:.2}{}", speed, units);
+                }
+                false => {
+                    let speed = self
+                        .clone()
+                        .wind
+                        .expect("Could not unpack wind!")
+                        .gust
+                        .expect("Could not unpack wind gust!");
+
+                    let speed = match units {
+                        "M" => speed,
+                        "I" => to_mph(speed),
+                        _ => speed,
+                    };
+
+                    let units = match units {
+                        "M" => "m/s",
+                        "I" => "miles/hr",
+                        _ => "m/s",
+                    };
+
+                    println!("{:.2}{}", speed, units);
+                }
+            },
+            // End
             _ => println!("No data to print for option {}", opt),
         };
     }
