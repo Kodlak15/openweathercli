@@ -1,18 +1,18 @@
 use crate::options::{args::Args, environment::Environment};
 use serde::Deserialize;
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Coord {
     pub lon: Option<f32>,
     pub lat: Option<f32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Weather {
     pub weather: WeatherData,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct WeatherData {
     pub id: Option<i32>,
     pub main: Option<String>,
@@ -20,7 +20,7 @@ pub struct WeatherData {
     pub icon: Option<String>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Main {
     pub temp: Option<f32>,
     pub feels_like: Option<f32>,
@@ -32,24 +32,24 @@ pub struct Main {
     pub grnd_level: Option<i32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Wind {
     pub speed: Option<f32>,
     pub deg: Option<i32>,
     pub gust: Option<f32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Rain {
     pub _1h: Option<f32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Clouds {
     pub all: Option<i32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Sys {
     pub r#type: Option<i32>,
     pub id: Option<i32>,
@@ -58,7 +58,7 @@ pub struct Sys {
     pub sunset: Option<i32>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct CurrentWeather {
     pub coord: Option<Coord>,
     pub weather: Option<Weather>,
@@ -97,7 +97,7 @@ impl CurrentWeather {
 
         let req_uri = format!(
             "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
-            0, 0, key
+            lat, lon, key
         );
 
         let response = reqwest::get(req_uri).await?;
@@ -111,8 +111,51 @@ impl CurrentWeather {
         let data: CurrentWeather =
             serde_json::from_str(&body).expect("Failed to deserialize response body!");
 
-        println!("Latitude: {}", data.coord.as_ref().unwrap().lat.unwrap());
-        println!("Longitude: {}", data.coord.as_ref().unwrap().lon.unwrap());
+        if let Some(opts) = args.print {
+            opts.split(',').for_each(|opt| match opt {
+                "lat" => match args.verbose {
+                    true => println!(
+                        "Latitude: {}",
+                        &data
+                            .clone()
+                            .coord
+                            .expect("Could not unpack coordinates!")
+                            .lat
+                            .expect("Could not unpack latitude!")
+                    ),
+                    false => println!(
+                        "{}",
+                        &data
+                            .clone()
+                            .coord
+                            .expect("Could not unpack coordinates!")
+                            .lat
+                            .expect("Could not unpack latitude!")
+                    ),
+                },
+                "lon" => match args.verbose {
+                    true => println!(
+                        "Longitude: {}",
+                        &data
+                            .clone()
+                            .coord
+                            .expect("Could not unpack coordinates!")
+                            .lon
+                            .expect("Could not unpack longitude!")
+                    ),
+                    false => println!(
+                        "{}",
+                        &data
+                            .clone()
+                            .coord
+                            .expect("Could not unpack coordinates!")
+                            .lon
+                            .expect("Could not unpack longitude!")
+                    ),
+                },
+                _ => todo!(),
+            });
+        }
 
         Ok(data)
     }
