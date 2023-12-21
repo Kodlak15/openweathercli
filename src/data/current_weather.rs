@@ -557,7 +557,6 @@ impl CurrentWeather {
                     println!("{:.2}{}", speed, units);
                 }
             },
-            // Start
             "rain_1h" => match args.verbose {
                 true => {
                     let rain = self
@@ -582,29 +581,166 @@ impl CurrentWeather {
                     println!("Rainfall 1hr: {:.2}{}", rain, units);
                 }
                 false => {
-                    let speed = self
+                    let rain = self
                         .clone()
-                        .wind
-                        .expect("Could not unpack wind!")
-                        .gust
-                        .expect("Could not unpack wind gust!");
+                        .rain
+                        .expect("Could not unpack rain!")
+                        ._1h
+                        .expect("Could not unpack 1 hour rainfall!");
 
-                    let speed = match units {
-                        "M" => speed,
-                        "I" => to_mph(speed),
-                        _ => speed,
+                    let rain = match units {
+                        "M" => rain,
+                        "I" => to_inches(rain),
+                        _ => rain,
                     };
 
                     let units = match units {
-                        "M" => "m/s",
-                        "I" => "mph",
-                        _ => "m/s",
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
                     };
 
-                    println!("{:.2}{}", speed, units);
+                    println!("{:.2}{}", rain, units);
                 }
             },
-            // End
+            "rain_3h" => match args.verbose {
+                true => {
+                    let rain = self
+                        .clone()
+                        .rain
+                        .expect("Could not unpack rain!")
+                        ._3h
+                        .expect("Could not unpack 3 hour rainfall!");
+
+                    let rain = match units {
+                        "M" => rain,
+                        "I" => to_inches(rain),
+                        _ => rain,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("Rainfall 3hr: {:.2}{}", rain, units);
+                }
+                false => {
+                    let rain = self
+                        .clone()
+                        .rain
+                        .expect("Could not unpack rain!")
+                        ._3h
+                        .expect("Could not unpack 3 hour rainfall!");
+
+                    let rain = match units {
+                        "M" => rain,
+                        "I" => to_inches(rain),
+                        _ => rain,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("{:.2}{}", rain, units);
+                }
+            },
+            "snow_1h" => match args.verbose {
+                true => {
+                    let snow = self
+                        .clone()
+                        .snow
+                        .expect("Could not unpack snow!")
+                        ._1h
+                        .expect("Could not unpack 1 hour snowfall!");
+
+                    let snow = match units {
+                        "M" => snow,
+                        "I" => to_inches(snow),
+                        _ => snow,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("Snowfall 1hr: {:.2}{}", snow, units);
+                }
+                false => {
+                    let snow = self
+                        .clone()
+                        .snow
+                        .expect("Could not unpack snow!")
+                        ._1h
+                        .expect("Could not unpack 1 hour snowfall!");
+
+                    let snow = match units {
+                        "M" => snow,
+                        "I" => to_inches(snow),
+                        _ => snow,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("{:.2}{}", snow, units);
+                }
+            },
+            "snow_3h" => match args.verbose {
+                true => {
+                    let snow = self
+                        .clone()
+                        .snow
+                        .expect("Could not unpack snow!")
+                        ._3h
+                        .expect("Could not unpack 3 hour snowfall!");
+
+                    let snow = match units {
+                        "M" => snow,
+                        "I" => to_inches(snow),
+                        _ => snow,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("Snowfall 3hr: {:.2}{}", snow, units);
+                }
+                false => {
+                    let snow = self
+                        .clone()
+                        .snow
+                        .expect("Could not unpack snow!")
+                        ._3h
+                        .expect("Could not unpack 3 hour snowfall!");
+
+                    let snow = match units {
+                        "M" => snow,
+                        "I" => to_inches(snow),
+                        _ => snow,
+                    };
+
+                    let units = match units {
+                        "M" => "mm",
+                        "I" => "in",
+                        _ => "mm",
+                    };
+
+                    println!("{:.2}{}", snow, units);
+                }
+            },
             _ => println!("No data to print for option {}", opt),
         };
     }

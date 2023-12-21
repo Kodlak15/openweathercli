@@ -14,6 +14,6 @@ pub fn to_mph(speed: f32) -> f32 {
 }
 
 // mm -> in
-pub fn to_inches(rain: f32) -> f32 {
-    rain / 25.4
+pub fn to_inches(precipitation: f32) -> f32 {
+    precipitation / 25.4
 }
