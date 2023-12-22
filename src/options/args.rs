@@ -4,10 +4,10 @@ use clap::Parser;
 pub struct Args {
     #[arg(long)]
     pub api: Option<String>,
-    #[arg(long)]
-    pub lat: Option<i32>,
-    #[arg(long)]
-    pub lon: Option<i32>,
+    #[arg(long, allow_hyphen_values(true))]
+    pub lat: Option<f64>,
+    #[arg(long, allow_hyphen_values(true))]
+    pub lon: Option<f64>,
     #[arg(long)]
     pub units: Option<String>,
     #[arg(short, long)]

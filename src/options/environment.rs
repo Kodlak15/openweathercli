@@ -1,9 +1,22 @@
 use dotenv::dotenv;
 use std::{collections::HashMap, env};
 
+pub fn set_workdir() {
+    let mut exe_path = env::current_exe().expect("Could not unpack path to executable!");
+    exe_path.pop();
+    exe_path.pop();
+    exe_path.pop();
+
+    if let Err(e) = env::set_current_dir(&exe_path) {
+        eprintln!("Error setting working directory: {}", e);
+    }
+}
+
 pub struct Environment {
     pub key: String,
     pub units: String,
+    pub lat: f64,
+    pub lon: f64,
 }
 
 impl Environment {
@@ -24,6 +37,23 @@ impl Environment {
             "".to_string()
         };
 
-        Self { key, units }
+        let lat = if let Some(lat) = environment.get("LATITUDE") {
+            lat.parse().expect("Could not parse latitude as f32!")
+        } else {
+            0.0
+        };
+
+        let lon = if let Some(lon) = environment.get("LONGITUDE") {
+            lon.parse().expect("Could not parse longitude as f32!")
+        } else {
+            0.0
+        };
+
+        Self {
+            key,
+            units,
+            lat,
+            lon,
+        }
     }
 }

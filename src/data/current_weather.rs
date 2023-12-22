@@ -12,11 +12,6 @@ pub struct Coord {
 
 #[derive(Deserialize, Clone)]
 pub struct Weather {
-    pub weather: Option<WeatherData>,
-}
-
-#[derive(Deserialize, Clone)]
-pub struct WeatherData {
     pub id: Option<i32>,
     pub main: Option<String>,
     pub description: Option<String>,
@@ -71,7 +66,7 @@ pub struct Sys {
 #[derive(Deserialize, Clone)]
 pub struct CurrentWeather {
     pub coord: Option<Coord>,
-    pub weather: Option<Weather>,
+    pub weather: Option<Vec<Weather>>,
     pub base: Option<String>,
     pub main: Option<Main>,
     pub visibility: Option<i32>,
@@ -91,12 +86,12 @@ impl CurrentWeather {
     pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
         let lat = match args.lat {
             Some(lat) => lat,
-            None => 0,
+            None => environment.lat,
         };
 
         let lon = match args.lon {
             Some(lon) => lon,
-            None => 0,
+            None => environment.lon,
         };
 
         let key = match &args.key {
@@ -172,44 +167,32 @@ impl CurrentWeather {
             "weather" => match args.verbose {
                 true => println!(
                     "Current weather: {}",
-                    self.clone()
-                        .weather
-                        .expect("Could not unpack weather!")
-                        .weather
-                        .expect("Could not unpack weather data!")
+                    self.clone().weather.expect("Could not unpack weather!")[0]
                         .main
+                        .clone()
                         .expect("Could not unpack main weather type!")
                 ),
                 false => println!(
                     "{}",
-                    self.clone()
-                        .weather
-                        .expect("Could not unpack weather!")
-                        .weather
-                        .expect("Could not unpack weather data!")
+                    self.clone().weather.expect("Could not unpack weather!")[0]
                         .main
+                        .clone()
                         .expect("Could not unpack main weather type!")
                 ),
             },
             "description" => match args.verbose {
                 true => println!(
                     "Weather description: {}",
-                    self.clone()
-                        .weather
-                        .expect("Could not unpack weather!")
-                        .weather
-                        .expect("Could not unpack weather data!")
+                    self.clone().weather.expect("Could not unpack weather!")[0]
                         .description
+                        .clone()
                         .expect("Could not unpack weather description!")
                 ),
                 false => println!(
                     "{}",
-                    self.clone()
-                        .weather
-                        .expect("Could not unpack weather!")
-                        .weather
-                        .expect("Could not unpack weather data!")
+                    self.clone().weather.expect("Could not unpack weather!")[0]
                         .description
+                        .clone()
                         .expect("Could not unpack weather description!")
                 ),
             },

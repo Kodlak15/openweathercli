@@ -1,11 +1,16 @@
 use clap::Parser;
 use openweathercli::{
     data::current_weather::CurrentWeather,
-    options::{args::Args, environment::Environment},
+    options::{
+        args::Args,
+        environment::{set_workdir, Environment},
+    },
 };
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
+    set_workdir();
+
     let args = Args::parse();
     let environment = Environment::load();
 
