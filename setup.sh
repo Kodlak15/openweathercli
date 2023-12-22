@@ -11,14 +11,12 @@ EXEPATH="$(find "$HOME" -name "openweathercli" -type f | grep "release")"
 OUTDIR="$HOME/bin"
 
 get_icons() {
-	icondir="$WORKDIR/icons"
+	icondir="$WORKDIR/assets/icons"
 
-	# Create the icons directory if it does not exist
 	if [[ ! -d "$icondir" ]]; then
-	    mkdir "$icondir"
+	    mkdir -p "$icondir"
 	fi
 	
-	# Names of all icons to retrieve
 	declare -a icons=(
 	    "01d"
 	    "01n"
@@ -40,16 +38,15 @@ get_icons() {
 	    "50n"
 	)
 	
-	if [[ $(find "$icondir" | wc -l) -lt 18 && ! $1 == "--noicons" ]]; then
-	    for icon in "${icons[@]}" 
-	    do
+	if [[ $(find "$icondir" | wc -l) -lt 18 && ! "$1" == "--noicons" ]]; then
+	    for icon in "${icons[@]}"; do
 	        curl "https://openweathermap.org/img/wn/$icon@2x.png" --output "$icondir/$icon.png"
 	    done
 	fi
 }
 
 setup() {
-	get_icons "$@"
+	get_icons "$1"
 
 	cargo build --release
 
@@ -60,4 +57,4 @@ setup() {
 	ln -sf "$EXEPATH" "$OUTDIR/owcli"
 }
 
-setup @
+setup "$@"
