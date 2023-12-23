@@ -164,6 +164,22 @@ impl CurrentWeather {
                         .expect("Could not unpack longitude!")
                 ),
             },
+            "id" => match args.verbose {
+                true => println!(
+                    "Weather ID: {}",
+                    self.clone().weather.expect("Could not unpack weather!")[0]
+                        .id
+                        .clone()
+                        .expect("Could not unpack weather ID!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone().weather.expect("Could not unpack weather!")[0]
+                        .id
+                        .clone()
+                        .expect("Could not unpack weather ID!")
+                ),
+            },
             "weather" => match args.verbose {
                 true => println!(
                     "Current weather: {}",
@@ -194,6 +210,22 @@ impl CurrentWeather {
                         .description
                         .clone()
                         .expect("Could not unpack weather description!")
+                ),
+            },
+            "icon" => match args.verbose {
+                true => println!(
+                    "Weather Icon: {}",
+                    self.clone().weather.expect("Could not unpack weather!")[0]
+                        .icon
+                        .clone()
+                        .expect("Could not unpack weather icon!")
+                ),
+                false => println!(
+                    "{}",
+                    self.clone().weather.expect("Could not unpack weather!")[0]
+                        .icon
+                        .clone()
+                        .expect("Could not unpack weather icon!")
                 ),
             },
             "temp" => match args.verbose {

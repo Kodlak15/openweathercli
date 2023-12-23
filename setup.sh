@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
-set -e
-
 # Setup script for the openweathermap.org CLI
-# Builds the executable and creates a symbolic link to some directory in PATH
+# Builds the executable, downloads icons, and creates a symbolic link to some directory in PATH
+# To prevent icons from being downloaded run with --noicons
 # Make sure OUTDIR is set to some directory in your PATH
 
 WORKDIR="$(find "$HOME" -name "openweathercli" -type d)"
