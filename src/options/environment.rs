@@ -13,14 +13,14 @@ pub fn set_workdir() {
 }
 
 pub struct Environment {
-    pub key: String,
-    pub units: String,
-    pub lat: f64,
-    pub lon: f64,
-    pub city: String,
-    pub state: String,
-    pub country: String,
-    pub zip: String,
+    pub key: Option<String>,
+    pub units: Option<String>,
+    pub lat: Option<String>,
+    pub lon: Option<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub country: Option<String>,
+    pub zip: Option<String>,
 }
 
 impl Environment {
@@ -29,55 +29,24 @@ impl Environment {
 
         let environment: HashMap<String, String> = env::vars().collect();
 
-        let key = match environment.get("API_KEY") {
-            Some(key) => key.to_string(),
-            None => "".to_string(),
-        };
-
-        let units = match environment.get("UNITS") {
-            Some(units) => units.to_string(),
-            None => "M".to_string(),
-        };
-
-        let lat = match environment.get("LATITUDE") {
-            Some(lat) => lat.parse().expect("Could not parse latitude as f64!"),
-            None => 0.0,
-        };
-
-        let lon = match environment.get("LONGITUDE") {
-            Some(lon) => lon.parse().expect("Could not parse longitude as f64!"),
-            None => 0.0,
-        };
-
-        let city = match environment.get("CITY") {
-            Some(city) => city.to_string(),
-            None => "".to_string(),
-        };
-
-        let state = match environment.get("STATE") {
-            Some(state) => state.to_string(),
-            None => "".to_string(),
-        };
-
-        let country = match environment.get("COUNTRY") {
-            Some(country) => country.to_string(),
-            None => "".to_string(),
-        };
-
-        let zip = match environment.get("ZIPCODE") {
-            Some(zip) => zip.to_string(),
-            None => "".to_string(),
-        };
+        let key = environment.get("API_KEY");
+        let units = environment.get("UNITS");
+        let lat = environment.get("LATITUDE");
+        let lon = environment.get("LONGITUDE");
+        let city = environment.get("CITY");
+        let state = environment.get("STATE");
+        let country = environment.get("COUNTRY");
+        let zip = environment.get("ZIPCODE");
 
         Self {
-            key,
-            units,
-            lat,
-            lon,
-            city,
-            state,
-            country,
-            zip,
+            key: key.cloned(),
+            units: units.cloned(),
+            lat: lat.cloned(),
+            lon: lon.cloned(),
+            city: city.cloned(),
+            state: state.cloned(),
+            country: country.cloned(),
+            zip: zip.cloned(),
         }
     }
 }

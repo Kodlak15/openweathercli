@@ -86,17 +86,20 @@ impl CurrentWeather {
     pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
         let lat = match args.lat {
             Some(lat) => lat,
-            None => environment.lat,
+            None => environment.lat.as_ref().unwrap().parse().unwrap(), // TODO
         };
 
         let lon = match args.lon {
             Some(lon) => lon,
-            None => environment.lon,
+            None => environment.lon.as_ref().unwrap().parse().unwrap(), // TODO
         };
 
         let key = match &args.key {
             Some(key) => key,
-            None => &environment.key,
+            None => match &environment.key {
+                Some(key) => key,
+                None => panic!("No API key found!"),
+            },
         };
 
         let req_uri = format!(
@@ -121,7 +124,10 @@ impl CurrentWeather {
     pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {
         let units = match &args.units {
             Some(units) => units,
-            None => &environment.units,
+            None => match &environment.units {
+                Some(units) => units,
+                None => "M",
+            },
         }
         .to_uppercase();
 
