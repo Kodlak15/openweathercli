@@ -6,8 +6,8 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
 pub struct Coord {
-    pub lon: Option<f32>,
-    pub lat: Option<f32>,
+    pub lon: Option<f64>,
+    pub lat: Option<f64>,
 }
 
 #[derive(Deserialize, Clone)]
