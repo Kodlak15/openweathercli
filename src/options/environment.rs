@@ -25,28 +25,29 @@ impl Environment {
 
         let environment: HashMap<String, String> = env::vars().collect();
 
-        let key = if let Some(key) = environment.get("API_KEY") {
-            key.to_string()
-        } else {
-            "".to_string()
+        let key = match environment.get("API_KEY") {
+            Some(key) => key.to_string(),
+            None => "".to_string(),
         };
 
-        let units = if let Some(units) = environment.get("UNITS") {
-            units.to_string()
-        } else {
-            "".to_string()
+        let units = match environment.get("UNITS") {
+            Some(units) => units.to_string(),
+            None => "M".to_string(),
         };
 
-        let lat = if let Some(lat) = environment.get("LATITUDE") {
-            lat.parse().expect("Could not parse latitude as f32!")
-        } else {
-            0.0
+        let lat = match environment.get("LATITUDE") {
+            Some(lat) => lat.parse().expect("Could not parse latitude as f64!"),
+            None => 0.0,
         };
 
-        let lon = if let Some(lon) = environment.get("LONGITUDE") {
-            lon.parse().expect("Could not parse longitude as f32!")
-        } else {
-            0.0
+        let lon = match environment.get("LONGITUDE") {
+            Some(lon) => lon.parse().expect("Could not parse longitude as f64!"),
+            None => 0.0,
+        };
+
+        let city = match environment.get("CITY") {
+            Some(city) => city,
+            None => "",
         };
 
         Self {
