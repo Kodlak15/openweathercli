@@ -6,6 +6,7 @@
 # Make sure OUTDIR is set to some directory in your PATH
 
 WORKDIR="$(find "$HOME" -name "openweathercli" -type d)"
+OUTDIR="$HOME/bin" # <- Set to some directory in your PATH if you prefer
 
 get_icons() {
 	icondir="$WORKDIR/assets/icons"
@@ -47,15 +48,13 @@ setup() {
 
 	cargo build --release
 
-	outdir="$HOME/bin"
-
-	if [[ ! -d "$outdir" ]]; then
-		mkdir -p "$outdir"
+	if [[ ! -d "$OUTDIR" ]]; then
+		mkdir -p "$OUTDIR"
 	fi
 
 	exepath="$(find "$HOME" -name "openweathercli" -type f | grep "release")"
 
-	ln -sf "$exepath" "$outdir/owcli"
+	ln -sf "$exepath" "$OUTDIR/owcli"
 }
 
 setup "$@"
