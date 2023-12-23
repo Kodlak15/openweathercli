@@ -10,7 +10,6 @@ use crate::{
 };
 use serde::Deserialize;
 
-// use super::geocoding::{self, Geocoding, GeocodingByName, GeocodingByZip};
 use super::geocoding::Geocoding;
 
 #[derive(Deserialize, Clone)]
@@ -106,26 +105,17 @@ impl CurrentWeather {
             None => panic!("No API key found!"),
         };
 
-        // Order of precedence: latitude/longitude > geolocation by name > geolocation by zip
-        // If coordinates cannot be retrieved, default to (0.0, 0.0)
         let (lat, lon) = match (lat, lon) {
             (Some(lat), Some(lon)) => (lat, lon),
             _ => {
                 let geocoding = Geocoding::get(&key, &city, &state, &country, &zip).await?;
 
                 match geocoding {
-                    Some(geocoding) => match (geocoding.by_name, geocoding.by_zip) {
-                        (Some(by_name), _) => match (by_name[0].lat, by_name[0].lon) {
-                            (Some(lat), Some(lon)) => (lat, lon),
-                            _ => (0.0, 0.0),
-                        },
-                        (_, Some(by_zip)) => match (by_zip[0].lat, by_zip[0].lon) {
-                            (Some(lat), Some(lon)) => (lat, lon),
-                            _ => (0.0, 0.0),
-                        },
+                    Some(data) => match (data.lat, data.lon) {
+                        (Some(lat), Some(lon)) => (lat, lon),
                         _ => (0.0, 0.0),
                     },
-                    _ => (0.0, 0.0),
+                    None => (0.0, 0.0),
                 }
             }
         };

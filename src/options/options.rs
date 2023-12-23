@@ -49,7 +49,7 @@ pub fn get_country(args: &Args, environment: &Environment) -> Option<String> {
 }
 
 pub fn get_zip(args: &Args, environment: &Environment) -> Option<String> {
-    match (&args.country, &environment.country) {
+    match (&args.zip, &environment.zip) {
         (Some(zip), _) => Some(zip.to_string()),
         (_, Some(zip)) => Some(zip.to_string()),
         _ => None,
