@@ -36,7 +36,7 @@ get_icons() {
 	    "50n"
 	)
 	
-	if [[ $(find "$icondir" | wc -l) -lt 18 && ! "$1" == "--noicons" ]]; then
+	if [[ "$(find "$icondir" | wc -l)" -lt 18 && ! "$1" == "--noicons" ]]; then
 	    for icon in "${icons[@]}"; do
 	        curl "https://openweathermap.org/img/wn/$icon@2x.png" --output "$icondir/$icon.png"
 	    done
