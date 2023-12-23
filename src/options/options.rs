@@ -55,3 +55,11 @@ pub fn get_zip(args: &Args, environment: &Environment) -> Option<String> {
         _ => None,
     }
 }
+
+pub fn get_units(args: &Args, environment: &Environment) -> Option<String> {
+    match (args.units, environment.units) {
+        (Some(units), _) => Some(units),
+        (_, Some(units)) => Some(units),
+        _ => None,
+    }
+}

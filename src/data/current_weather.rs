@@ -3,10 +3,14 @@ use crate::{
     options::{
         args::Args,
         environment::Environment,
-        options::{get_lat, get_lon},
+        options::{
+            get_city, get_country, get_key, get_lat, get_lon, get_state, get_units, get_zip,
+        },
     },
 };
 use serde::Deserialize;
+
+use super::geocoding::{GeocodingByName, GeocodingByZip};
 
 #[derive(Deserialize, Clone)]
 pub struct Coord {
@@ -88,24 +92,54 @@ pub struct CurrentWeather {
 
 impl CurrentWeather {
     pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
+        let key = get_key(args, environment);
         let lat = get_lat(args, environment);
         let lon = get_lon(args, environment);
+        let city = get_city(args, environment);
+        let state = get_state(args, environment);
+        let country = get_country(args, environment);
+        let zip = get_zip(args, environment);
+        let units = get_units(args, environment);
 
-        let lat = match args.lat {
-            Some(lat) => lat,
-            None => environment.lat.as_ref().unwrap().parse().unwrap(), // TODO
+        let key = match key {
+            Some(key) => key,
+            None => panic!("No API key found!"),
         };
 
-        let lon = match args.lon {
-            Some(lon) => lon,
-            None => environment.lon.as_ref().unwrap().parse().unwrap(), // TODO
+        let (lat, lon) = match (lat, lon) {
+            (Some(lat), Some(lon)) => (lat, lon),
+            _ => match (&city, &state, &country) {
+                (Some(city), Some(state), Some(country)) => {
+                    let geocoding = GeocodingByName::get(&key, &city, &state, &country).await?;
+
+                    match (geocoding.lat, geocoding.lon) {
+                        (Some(lat), Some(lon)) => (lat, lon),
+                        _ => match (&country, &zip) {
+                            (Some(country), Some(zip)) => (0.0, 0.0),
+                            _ => (0.0, 0.0),
+                        },
+                    }
+                }
+                _ => match (&country, &zip) {
+                    (Some(country), Some(zip)) => {
+                        let geocoding = GeocodingByZip::get(&key, &country, &zip).await?;
+
+                        match (geocoding.lat, geocoding.lon) {
+                            (Some(lat), Some(lon)) => (lat, lon),
+                            _ => (0.0, 0.0),
+                        }
+                    }
+                    _ => (0.0, 0.0),
+                },
+            },
         };
 
-        let key = match (&args.key, &environment.key) {
-            (Some(key), _) => key,
-            (_, Some(key)) => key,
-            _ => panic!("No API key found!"),
-        };
+        let units = match units {
+            Some(units) => units,
+            None => "M".to_string(),
+        }
+        .to_uppercase()
+        .as_str();
 
         let req_uri = format!(
             "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
