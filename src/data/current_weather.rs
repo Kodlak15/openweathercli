@@ -10,7 +10,8 @@ use crate::{
 };
 use serde::Deserialize;
 
-use super::geocoding::{GeocodingByName, GeocodingByZip};
+// use super::geocoding::{self, Geocoding, GeocodingByName, GeocodingByZip};
+use super::geocoding::Geocoding;
 
 #[derive(Deserialize, Clone)]
 pub struct Coord {
@@ -105,41 +106,28 @@ impl CurrentWeather {
             None => panic!("No API key found!"),
         };
 
+        // Order of precedence: latitude/longitude > geolocation by name > geolocation by zip
+        // If coordinates cannot be retrieved, default to (0.0, 0.0)
         let (lat, lon) = match (lat, lon) {
             (Some(lat), Some(lon)) => (lat, lon),
-            _ => match (&city, &state, &country) {
-                (Some(city), Some(state), Some(country)) => {
-                    let geocoding = GeocodingByName::get(&key, &city, &state, &country).await?;
+            _ => {
+                let geocoding = Geocoding::get(&key, &city, &state, &country, &zip).await?;
 
-                    match (geocoding.lat, geocoding.lon) {
-                        (Some(lat), Some(lon)) => (lat, lon),
-                        _ => {
-                            eprintln!(
-                                "Unable to retrieve geolocation data for {}, {}, {}",
-                                city, state, country
-                            );
-                            (0.0, 0.0)
-                        }
-                    }
-                }
-                _ => match (&country, &zip) {
-                    (Some(country), Some(zip)) => {
-                        let geocoding = GeocodingByZip::get(&key, &country, &zip).await?;
-
-                        match (geocoding.lat, geocoding.lon) {
+                match geocoding {
+                    Some(geocoding) => match (geocoding.by_name, geocoding.by_zip) {
+                        (Some(by_name), _) => match (by_name[0].lat, by_name[0].lon) {
                             (Some(lat), Some(lon)) => (lat, lon),
-                            _ => {
-                                eprintln!(
-                                    "Unable to retrieve geolocation data for zip code {}, {}",
-                                    zip, country
-                                );
-                                (0.0, 0.0)
-                            }
-                        }
-                    }
+                            _ => (0.0, 0.0),
+                        },
+                        (_, Some(by_zip)) => match (by_zip[0].lat, by_zip[0].lon) {
+                            (Some(lat), Some(lon)) => (lat, lon),
+                            _ => (0.0, 0.0),
+                        },
+                        _ => (0.0, 0.0),
+                    },
                     _ => (0.0, 0.0),
-                },
-            },
+                }
+            }
         };
 
         let req_uri = format!(
