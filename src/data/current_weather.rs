@@ -1,6 +1,10 @@
 use crate::{
     data::convert::{to_celsius, to_fahrenheight, to_inches, to_mph},
-    options::{args::Args, environment::Environment},
+    options::{
+        args::Args,
+        environment::Environment,
+        options::{get_lat, get_lon},
+    },
 };
 use serde::Deserialize;
 
@@ -84,6 +88,9 @@ pub struct CurrentWeather {
 
 impl CurrentWeather {
     pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
+        let lat = get_lat(args, environment);
+        let lon = get_lon(args, environment);
+
         let lat = match args.lat {
             Some(lat) => lat,
             None => environment.lat.as_ref().unwrap().parse().unwrap(), // TODO
@@ -94,12 +101,10 @@ impl CurrentWeather {
             None => environment.lon.as_ref().unwrap().parse().unwrap(), // TODO
         };
 
-        let key = match &args.key {
-            Some(key) => key,
-            None => match &environment.key {
-                Some(key) => key,
-                None => panic!("No API key found!"),
-            },
+        let key = match (&args.key, &environment.key) {
+            (Some(key), _) => key,
+            (_, Some(key)) => key,
+            _ => panic!("No API key found!"),
         };
 
         let req_uri = format!(
