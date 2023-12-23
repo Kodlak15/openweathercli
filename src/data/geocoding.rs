@@ -7,8 +7,18 @@ impl Geocoding {
     pub fn get_by_name(args: &Args, environment: Environment) -> Result<Self, reqwest::Error> {
         let city = match &args.city {
             Some(city) => city,
-            None => environment.city,
-        }
+            None => &environment.city,
+        };
+
+        let state = match &args.state {
+            Some(state) => state,
+            None => &environment.state,
+        };
+
+        let country = match &args.country {
+            Some(country) => country,
+            None => &environment.country,
+        };
 
         let key = match &args.key {
             Some(key) => key,
@@ -17,7 +27,7 @@ impl Geocoding {
 
         let req_uri = format!(
             "http://api.openweathermap.org/geo/1.0/direct?q={},{},{}&limit={}&appid={}",
-            "Seattle", "WA", "USA", 1, key
+            city, state, country, 1, key
         );
 
         Ok(Self {})

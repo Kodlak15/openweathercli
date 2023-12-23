@@ -17,6 +17,10 @@ pub struct Environment {
     pub units: String,
     pub lat: f64,
     pub lon: f64,
+    pub city: String,
+    pub state: String,
+    pub country: String,
+    pub zip: String,
 }
 
 impl Environment {
@@ -46,8 +50,23 @@ impl Environment {
         };
 
         let city = match environment.get("CITY") {
-            Some(city) => city,
-            None => "",
+            Some(city) => city.to_string(),
+            None => "".to_string(),
+        };
+
+        let state = match environment.get("STATE") {
+            Some(state) => state.to_string(),
+            None => "".to_string(),
+        };
+
+        let country = match environment.get("COUNTRY") {
+            Some(country) => country.to_string(),
+            None => "".to_string(),
+        };
+
+        let zip = match environment.get("ZIPCODE") {
+            Some(zip) => zip.to_string(),
+            None => "".to_string(),
         };
 
         Self {
@@ -55,6 +74,10 @@ impl Environment {
             units,
             lat,
             lon,
+            city,
+            state,
+            country,
+            zip,
         }
     }
 }
