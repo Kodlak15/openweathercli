@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::Deserialize;
 
+// This is so unreasonably borked it hurts
+
 #[derive(Deserialize, Clone)]
 pub struct GeocodingByName {
     pub name: Option<String>,
@@ -86,18 +88,15 @@ impl Geocoding {
     ) -> Result<Self, reqwest::Error> {
         let by_name = match (&city, &state, &country) {
             (Some(city), Some(state), Some(country)) => {
-                Some(GeocodingByName::get(key, city, state, country).await?)
+                Some(vec![GeocodingByName::get(key, city, state, country).await?])
             }
             _ => None,
         };
 
         let by_zip = match (&country, &zip) {
-            (Some(country), Some(zip)) => Some(GeocodingByZip::get(key, country, zip).await?),
+            (Some(country), Some(zip)) => Some(vec![GeocodingByZip::get(key, country, zip).await?]),
             _ => None,
         };
-
-        let by_name = vec![by_name];
-        let by_zip = vec![by_zip];
 
         Ok(Self { by_name, by_zip })
     }
