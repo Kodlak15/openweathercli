@@ -1,5 +1,13 @@
 use super::{args::Args, environment::Environment};
 
+pub fn get_key(args: &Args, environment: &Environment) -> Option<String> {
+    match (args.key, environment.key) {
+        (Some(key), _) => Some(key),
+        (_, Some(key)) => Some(key),
+        _ => None,
+    }
+}
+
 pub fn get_lat(args: &Args, environment: &Environment) -> Option<f64> {
     match (args.lat, environment.lat) {
         (Some(lat), _) => Some(lat),

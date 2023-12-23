@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use crate::options::{args::Args, environment::Environment};
+use crate::options::{
+    args::Args,
+    environment::Environment,
+    options::{get_city, get_country, get_state},
+};
 use serde::Deserialize;
 
 #[derive(Deserialize, Clone)]
@@ -17,21 +21,25 @@ pub struct GeocodingByName {
 pub struct GeocodingByZip {}
 
 impl GeocodingByName {
-    pub async fn get(args: &Args, environment: Environment) -> Result<Self, reqwest::Error> {
-        let city = match &args.city {
-            Some(city) => city,
-            None => &environment.city,
-        };
+    pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
+        let city = get_city(args, environment);
+        let state = get_state(args, environment);
+        let country = get_country(args, environment);
 
-        let state = match &args.state {
-            Some(state) => state,
-            None => &environment.state,
-        };
-
-        let country = match &args.country {
-            Some(country) => country,
-            None => &environment.country,
-        };
+        // let city = match &args.city {
+        //     Some(city) => city,
+        //     None => &environment.city,
+        // };
+        //
+        // let state = match &args.state {
+        //     Some(state) => state,
+        //     None => &environment.state,
+        // };
+        //
+        // let country = match &args.country {
+        //     Some(country) => country,
+        //     None => &environment.country,
+        // };
 
         let key = match &args.key {
             Some(key) => key,
