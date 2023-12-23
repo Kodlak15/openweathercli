@@ -15,6 +15,7 @@
 # Features
 - Get information about temperature, wind chill, weather, precipitation, and more
 - Select location by latitude/longitude, city/state/country, or country/zipcode
+- It is recommended to use latitude/longitude as the other options require a second API call to get geolocation data
 - Choose options via command line arguments, or set environment variables via a .env file
 - Command line options take precedence over environment variables
 - Order of precedence for location selection is latitude/longitude > city/state/country > country/zipcode
