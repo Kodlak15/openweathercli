@@ -21,6 +21,12 @@ pub struct GeocodingByZip {
     pub country: Option<String>,
 }
 
+#[derive(Deserialize, Clone)]
+pub struct Geocoding {
+    by_name: Option<Vec<GeocodingByName>>,
+    by_zip: Option<Vec<GeocodingByZip>>,
+}
+
 impl GeocodingByName {
     pub async fn get(
         key: &String,
@@ -67,5 +73,32 @@ impl GeocodingByZip {
             serde_json::from_str(&body).expect("Failed to deserialize response body!");
 
         Ok(data)
+    }
+}
+
+impl Geocoding {
+    pub async fn get(
+        key: &String,
+        city: &Option<String>,
+        state: &Option<String>,
+        country: &Option<String>,
+        zip: &Option<String>,
+    ) -> Result<Self, reqwest::Error> {
+        let by_name = match (&city, &state, &country) {
+            (Some(city), Some(state), Some(country)) => {
+                Some(GeocodingByName::get(key, city, state, country).await?)
+            }
+            _ => None,
+        };
+
+        let by_zip = match (&country, &zip) {
+            (Some(country), Some(zip)) => Some(GeocodingByZip::get(key, country, zip).await?),
+            _ => None,
+        };
+
+        let by_name = vec![by_name];
+        let by_zip = vec![by_zip];
+
+        Ok(Self { by_name, by_zip })
     }
 }

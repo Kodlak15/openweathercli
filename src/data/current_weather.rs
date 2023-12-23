@@ -99,7 +99,6 @@ impl CurrentWeather {
         let state = get_state(args, environment);
         let country = get_country(args, environment);
         let zip = get_zip(args, environment);
-        let units = get_units(args, environment);
 
         let key = match key {
             Some(key) => key,
@@ -114,10 +113,13 @@ impl CurrentWeather {
 
                     match (geocoding.lat, geocoding.lon) {
                         (Some(lat), Some(lon)) => (lat, lon),
-                        _ => match (&country, &zip) {
-                            (Some(country), Some(zip)) => (0.0, 0.0),
-                            _ => (0.0, 0.0),
-                        },
+                        _ => {
+                            eprintln!(
+                                "Unable to retrieve geolocation data for {}, {}, {}",
+                                city, state, country
+                            );
+                            (0.0, 0.0)
+                        }
                     }
                 }
                 _ => match (&country, &zip) {
@@ -126,20 +128,19 @@ impl CurrentWeather {
 
                         match (geocoding.lat, geocoding.lon) {
                             (Some(lat), Some(lon)) => (lat, lon),
-                            _ => (0.0, 0.0),
+                            _ => {
+                                eprintln!(
+                                    "Unable to retrieve geolocation data for zip code {}, {}",
+                                    zip, country
+                                );
+                                (0.0, 0.0)
+                            }
                         }
                     }
                     _ => (0.0, 0.0),
                 },
             },
         };
-
-        let units = match units {
-            Some(units) => units,
-            None => "M".to_string(),
-        }
-        .to_uppercase()
-        .as_str();
 
         let req_uri = format!(
             "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}",
@@ -161,12 +162,11 @@ impl CurrentWeather {
     }
 
     pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {
-        let units = match &args.units {
+        let units = get_units(args, environment);
+
+        let units = match units {
             Some(units) => units,
-            None => match &environment.units {
-                Some(units) => units,
-                None => "M",
-            },
+            None => "M".to_string(),
         }
         .to_uppercase();
 
