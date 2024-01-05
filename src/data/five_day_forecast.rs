@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use serde::Deserialize;
 
 use crate::{
@@ -5,13 +6,30 @@ use crate::{
     options::{
         args::Args,
         environment::Environment,
-        options::{get_city, get_country, get_key, get_lat, get_lon, get_state, get_zip},
+        options::{
+            get_city, get_country, get_key, get_lat, get_lon, get_state, get_units, get_zip,
+        },
     },
 };
 
 use super::geocoding::Geocoding;
 
-#[derive(Deserialize, Clone)]
+fn get_high_temps(data: FiveDayForecast) -> Vec<f32> {
+    // data.list
+    //     .expect("Could not unpack list!")
+    //     .iter()
+    //     .map(|day| {
+    //
+    //     });
+
+    vec![]
+}
+
+fn get_low_temps(data: FiveDayForecast) -> Vec<f32> {
+    vec![]
+}
+
+#[derive(Deserialize, Clone, Debug)]
 pub struct Main {
     temp: Option<f32>,
     feels_like: Option<f32>,
@@ -21,10 +39,10 @@ pub struct Main {
     sea_level: Option<i32>,
     grnd_level: Option<i32>,
     humidity: Option<i32>,
-    temp_kf: Option<i32>,
+    temp_kf: Option<f32>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Weather {
     id: Option<i32>,
     main: Option<String>,
@@ -32,38 +50,38 @@ pub struct Weather {
     icon: Option<String>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Clouds {
     all: Option<i8>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Wind {
     speed: Option<f32>,
     deg: Option<i32>,
     gust: Option<f32>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Rain {
     _1h: Option<f32>,
     _3h: Option<f32>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Snow {
     _1h: Option<f32>,
     _3h: Option<f32>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Sys {
     pod: Option<String>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct Day {
-    dt: Option<String>,
+    dt: Option<i32>,
     main: Option<Main>,
     weather: Vec<Weather>,
     clouds: Option<Clouds>,
@@ -76,7 +94,7 @@ pub struct Day {
     dt_txt: Option<String>,
 }
 
-#[derive(Deserialize, Clone)]
+#[derive(Deserialize, Clone, Debug)]
 pub struct FiveDayForecast {
     cod: Option<String>,
     message: Option<i32>,
@@ -130,10 +148,89 @@ impl FiveDayForecast {
         let data: FiveDayForecast =
             serde_json::from_str(&body).expect("Failed to deserialize response body!");
 
-        println!("Body: {:?}", body);
-
         Ok(Data::FiveDayForecast(data))
     }
 
-    pub fn print(&self, _opt: &str, _args: &Args, _environment: &Environment) {}
+    pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {
+        let units = get_units(args, environment);
+
+        let units = match units {
+            Some(units) => units,
+            None => "M".to_string(),
+        }
+        .to_uppercase();
+
+        let units = units.as_str();
+
+        let list = self.list.clone().expect("Could not unpack list!");
+
+        let days = list.iter().group_by(|day| {
+            day.dt_txt
+                .clone()
+                .expect("Could not unpack datetime string!")
+                .split_whitespace()
+                .next()
+                .unwrap()
+                .to_owned()
+        });
+
+        match opt {
+            "temp" => match args.verbose {
+                true => {
+                    println!("Five day forecast:");
+
+                    let tmax: Vec<f32> = days
+                        .into_iter()
+                        .map(|(_, day)| {
+                            let day = &day.collect::<Vec<&Day>>();
+                            day.iter()
+                                .map(|day| {
+                                    day.main
+                                        .clone()
+                                        .expect("Could not unpack main!")
+                                        .temp_max
+                                        .expect("Could not unpack max temperature!")
+                                })
+                                .fold(None, |acc, x| {
+                                    Some(match acc {
+                                        Some(max) => f32::max(max, x),
+                                        None => x,
+                                    })
+                                })
+                                .expect("Could not unpack max temperature for day!")
+                        })
+                        .collect();
+
+                    let tmin: Vec<f32> = days
+                        .into_iter()
+                        .map(|(_, day)| {
+                            let day = &day.collect::<Vec<&Day>>().clone();
+                            day.iter()
+                                .map(|day| {
+                                    day.main
+                                        .clone()
+                                        .expect("Could not unpack main!")
+                                        .temp_min
+                                        .expect("Could not unpack min temperature!")
+                                })
+                                .fold(None, |acc, x| {
+                                    Some(match acc {
+                                        Some(min) => f32::min(min, x),
+                                        None => x,
+                                    })
+                                })
+                                .expect("Could not unpack min temperature for day!")
+                        })
+                        .collect();
+
+                    // TODO: handle unit conversions
+                    // Also, tmax operation seems to leave no data for tmin YAYYYYYYY
+                    println!("Tmax: {:?}", tmax);
+                    println!("Tmin: {:?}", tmin);
+                }
+                false => todo!(),
+            },
+            _ => println!("No data to print for option {}", opt),
+        };
+    }
 }
