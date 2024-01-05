@@ -10,7 +10,7 @@ use crate::{
 };
 use serde::Deserialize;
 
-use super::geocoding::Geocoding;
+use super::{data::Data, geocoding::Geocoding};
 
 #[derive(Deserialize, Clone)]
 pub struct Coord {
@@ -91,7 +91,7 @@ pub struct CurrentWeather {
 }
 
 impl CurrentWeather {
-    pub async fn get(args: &Args, environment: &Environment) -> Result<Self, reqwest::Error> {
+    pub async fn get(args: &Args, environment: &Environment) -> Result<Data, reqwest::Error> {
         let key = get_key(args, environment);
         let lat = get_lat(args, environment);
         let lon = get_lon(args, environment);
@@ -136,7 +136,7 @@ impl CurrentWeather {
         let data: CurrentWeather =
             serde_json::from_str(&body).expect("Failed to deserialize response body!");
 
-        Ok(data)
+        Ok(Data::CurrentWeather(data))
     }
 
     pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {

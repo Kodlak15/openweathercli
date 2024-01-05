@@ -1,6 +1,6 @@
 use clap::Parser;
 use openweathercli::{
-    data::current_weather::CurrentWeather,
+    data::{current_weather::CurrentWeather, data::Data, five_day_forecast::FiveDayForecast},
     options::{
         args::Args,
         environment::{set_workdir, Environment},
@@ -21,15 +21,15 @@ async fn main() -> Result<(), reqwest::Error> {
     };
 
     let data = match api.as_str() {
-        "current" => CurrentWeather::get(&args, &environment),
-        "forecast" => todo!(),
-        _ => CurrentWeather::get(&args, &environment),
-    }
-    .await?;
+        "current" => CurrentWeather::get(&args, &environment).await?,
+        "forecast" => FiveDayForecast::get(&args, &environment).await?,
+        _ => CurrentWeather::get(&args, &environment).await?,
+    };
 
     if let Some(opts) = &args.print {
-        opts.split(',').for_each(|opt| {
-            data.print(opt, &args, &environment);
+        opts.split(',').for_each(|opt| match &data {
+            Data::CurrentWeather(dtype) => dtype.print(opt, &args, &environment),
+            Data::FiveDayForecast(dtype) => dtype.print(opt, &args, &environment),
         });
     }
 
