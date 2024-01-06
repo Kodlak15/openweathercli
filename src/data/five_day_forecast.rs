@@ -1,4 +1,4 @@
-use itertools::{GroupBy, Itertools};
+use itertools::Itertools;
 use serde::Deserialize;
 
 use crate::{
@@ -16,8 +16,6 @@ use crate::{
 };
 
 use super::geocoding::Geocoding;
-
-fn get_days() {}
 
 #[allow(dead_code)]
 #[derive(Deserialize, Clone, Debug)]
