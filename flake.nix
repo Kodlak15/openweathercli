@@ -48,5 +48,24 @@
         '';
       };
     });
+
+    packages = forEachSupportedSystem ({pkgs}: {
+      default = let
+        rustPlatform = pkgs.makeRustPlatform {
+          cargo = pkgs.rustToolchain;
+          rustc = pkgs.rustToolchain;
+        };
+      in
+        rustPlatform.buildRustPackage {
+          name = "openweathercli";
+          src = ./.;
+          cargoLock = {
+            lockFile = ./Cargo.lock;
+          };
+
+          nativeBuildInputs = with pkgs; [pkg-config];
+          PKG_CONFIG_PATH = "${pkgs.openssl.dev}/lib/pkgconfig";
+        };
+    });
   };
 }
