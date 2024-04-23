@@ -58,7 +58,13 @@
       in
         rustPlatform.buildRustPackage {
           name = "openweathercli";
-          src = ./.;
+          pname = "openweathercli";
+          src = pkgs.fetchFromGitHub {
+            owner = "Kodlak15";
+            repo = "openweathercli";
+            rev = "9f0b110436c513b9b48dbbdd8daf73cecf329fbd";
+            hash = "sha256-IpC71rhyAzihcpfJ4LFSKFHhr52a+97NL5iP9U77NeA=";
+          };
           cargoLock = {
             lockFile = ./Cargo.lock;
           };

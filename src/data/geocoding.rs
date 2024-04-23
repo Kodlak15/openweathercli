@@ -3,10 +3,10 @@ use std::collections::HashMap;
 use serde::Deserialize;
 
 async fn geocoding_by_name(
-    key: &String,
-    city: &String,
-    state: &String,
-    country: &String,
+    key: &str,
+    city: &str,
+    state: &str,
+    country: &str,
 ) -> Result<Geocoding, reqwest::Error> {
     let req_uri = format!(
         "http://api.openweathermap.org/geo/1.0/direct?q={},{},{}&limit={}&appid={}",
@@ -28,9 +28,9 @@ async fn geocoding_by_name(
 }
 
 async fn geocoding_by_zip(
-    key: &String,
-    country: &String,
-    zip: &String,
+    key: &str,
+    country: &str,
+    zip: &str,
 ) -> Result<Geocoding, reqwest::Error> {
     let req_uri = format!(
         "http://api.openweathermap.org/geo/1.0/zip?zip={},{}&appid={}",
@@ -45,11 +45,6 @@ async fn geocoding_by_zip(
     }
 
     let body = response.text().await?;
-    // TODO:
-    // the idiomatic way of handling this would be to have a separate struct to handle by_zip
-    //
-    // by_city returns a sequence of maps, while by_zip returns a single map, so their structs need
-    // to be slightly different, although in the interim this works okay
     let value: serde_json::Value = serde_json::from_str(&body).unwrap();
     let geocoding_data: GeocodingData = serde_json::from_value(value).unwrap();
     let geocoding = Geocoding {
@@ -77,11 +72,11 @@ pub struct Geocoding {
 
 impl Geocoding {
     pub async fn get(
-        key: &String,
-        city: &Option<String>,
-        state: &Option<String>,
-        country: &Option<String>,
-        zip: &Option<String>,
+        key: &str,
+        city: Option<String>,
+        state: Option<String>,
+        country: Option<String>,
+        zip: Option<String>,
     ) -> Result<Option<GeocodingData>, reqwest::Error> {
         match (&city, &state, &country, &zip) {
             (Some(city), Some(state), Some(country), Some(zip)) => {
