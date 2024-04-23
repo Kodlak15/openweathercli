@@ -1,37 +1,67 @@
 use clap::Parser;
-use openweathercli::{
-    data::current_weather::CurrentWeather,
-    options::{
-        args::Args,
-        environment::{set_workdir, Environment},
-    },
-};
+use dotenv::dotenv;
+use std::{collections::HashMap, env};
+
+#[derive(Parser, Debug)]
+pub struct Args {
+    #[arg(long)]
+    pub api: Option<String>,
+    #[arg(long, allow_hyphen_values(true))]
+    pub lat: Option<f64>,
+    #[arg(long, allow_hyphen_values(true))]
+    pub lon: Option<f64>,
+    #[arg(long)]
+    pub city: Option<String>,
+    #[arg(long)]
+    pub state: Option<String>,
+    #[arg(long)]
+    pub country: Option<String>,
+    #[arg(long)]
+    pub zip: Option<String>,
+    #[arg(long)]
+    pub units: Option<String>,
+    #[arg(short, long)]
+    pub key: Option<String>,
+    #[arg(short, long)]
+    pub print: Option<String>, // Print user specified information
+    #[arg(short, long)]
+    pub summary: Option<String>, // Print general summary of data
+    #[arg(short, long, action)]
+    pub verbose: bool,
+}
+
+pub struct Environment {
+    pub key: Option<String>,
+    pub units: Option<String>,
+    pub lat: Option<String>,
+    pub lon: Option<String>,
+    pub city: Option<String>,
+    pub state: Option<String>,
+    pub country: Option<String>,
+    pub zip: Option<String>,
+}
+
+impl Environment {
+    pub fn load() -> Self {
+        // Load environment variables from .env
+        dotenv().ok();
+        let environment: HashMap<String, String> = env::vars().collect();
+
+        Self {
+            key: environment.get("API_KEY").cloned(),
+            units: environment.get("UNITS").cloned(),
+            lat: environment.get("LATITUDE").cloned(),
+            lon: environment.get("LONGITUDE").cloned(),
+            city: environment.get("CITY").cloned(),
+            state: environment.get("STATE").cloned(),
+            country: environment.get("COUNTRY").cloned(),
+            zip: environment.get("ZIPCODE").cloned(),
+        }
+    }
+}
 
 #[tokio::main]
-async fn main() -> Result<(), reqwest::Error> {
-    set_workdir();
-
+async fn main() {
     let args = Args::parse();
-    let environment = Environment::load();
-
-    let api = if let Some(api) = &args.api {
-        api.to_owned()
-    } else {
-        "current".to_string()
-    };
-
-    let data = match api.as_str() {
-        "current" => CurrentWeather::get(&args, &environment),
-        "forecast" => todo!(),
-        _ => CurrentWeather::get(&args, &environment),
-    }
-    .await?;
-
-    if let Some(opts) = &args.print {
-        opts.split(',').for_each(|opt| {
-            data.print(opt, &args, &environment);
-        });
-    }
-
-    Ok(())
+    println!("{:?}", env::current_dir().unwrap())
 }
