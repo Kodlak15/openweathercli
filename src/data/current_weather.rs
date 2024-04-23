@@ -2,7 +2,7 @@ use crate::{
     data::convert::{to_celsius, to_fahrenheight, to_inches, to_mph},
     options::{
         args::Args,
-        environment::Environment,
+        config::Config,
         options::{
             get_city, get_country, get_key, get_lat, get_lon, get_state, get_units, get_zip,
         },
@@ -91,14 +91,14 @@ pub struct CurrentWeather {
 }
 
 impl CurrentWeather {
-    pub async fn get(args: &Args, environment: &Environment) -> Result<Data, reqwest::Error> {
-        let key = get_key(args, environment);
-        let lat = get_lat(args, environment);
-        let lon = get_lon(args, environment);
-        let city = get_city(args, environment);
-        let state = get_state(args, environment);
-        let country = get_country(args, environment);
-        let zip = get_zip(args, environment);
+    pub async fn get(args: &Args, config: &Config) -> Result<Data, reqwest::Error> {
+        let key = get_key(args, config);
+        let lat = get_lat(args, config);
+        let lon = get_lon(args, config);
+        let city = get_city(args, config);
+        let state = get_state(args, config);
+        let country = get_country(args, config);
+        let zip = get_zip(args, config);
 
         let key = match key {
             Some(key) => key,
@@ -139,8 +139,8 @@ impl CurrentWeather {
         Ok(Data::CurrentWeather(data))
     }
 
-    pub fn print(&self, opt: &str, args: &Args, environment: &Environment) {
-        let units = get_units(args, environment);
+    pub fn print(&self, opt: &str, args: &Args, config: &Config) {
+        let units = get_units(args, config);
 
         let units = match units {
             Some(units) => units,

@@ -12,6 +12,7 @@
 
 # TODO
 - Add support for five day forecast
+- Change configuration
 - Improve documentation
 
 # Examples
