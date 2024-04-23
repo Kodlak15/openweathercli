@@ -220,7 +220,7 @@ impl FiveDayForecast {
                         })
                         .unzip();
 
-                    let (date, (tmin, tmax)) = get_daily_temps(days, units);
+                    // let (date, (tmin, tmax)) = get_daily_temps(days, units);
 
                     for (date, (max, min)) in date.iter().zip(tmax.iter().zip(tmin.iter())) {
                         println!("[{}] High: {:.2}, Low: {:.2}", date, max, min);
