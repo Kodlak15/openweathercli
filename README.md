@@ -1,6 +1,5 @@
 # OpenWeatherCLI
-- A command line interface for the openweathermap.org API (free tier)
-- Get weather data for locations around the world from the command line
+This is a simple command line interface for the openweathermap.org API (free tier). You can use this in a terminal or in your scripts to get weather data for locations all around the world
 
 # Getting Access
 - You will need an openweathermap.org API key to use this program
@@ -10,10 +9,13 @@
 - It can take up to 2 hours upon creation of your account for your API key to get registered
 - You can add your API key as an environment variable or pass it as a command line argument
 
+# Configuration
+If you prefer, you can configure the program using a yaml file read from $HOME/.config/owcli/config.yaml. An example configuration file is included. 
+
 # TODO
 - Add support for five day forecast
-- Change configuration
 - Improve documentation
+- Allow configuration file to be loaded from alternate locations
 
 # Examples
 ```
