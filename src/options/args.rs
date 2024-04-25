@@ -24,6 +24,4 @@ pub struct Args {
     pub print: Option<String>, // Print user specified information
     #[arg(short, long)]
     pub summary: Option<String>, // Print general summary of data
-    #[arg(short, long, action)]
-    pub verbose: bool,
 }
